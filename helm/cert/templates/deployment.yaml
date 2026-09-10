@@ -1,40 +1,40 @@
+{{- if .Values.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cert
-  namespace: cert
+  name: {{ include "cert.fullname" . }}
+  namespace: {{ .Values.namespaceOverride | default .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: cert
-    app.kubernetes.io/part-of: arca-suite
+    {{- include "cert.labels" . | nindent 4 }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: cert
+      {{- include "cert.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: cert
-        app.kubernetes.io/part-of: arca-suite
+        {{- include "cert.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: cert
+      serviceAccountName: {{ include "cert.serviceAccountName" . }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
         fsGroup: 10001
       containers:
-        - name: cert
-          image: registry.arca.local/arca-cert:0.1.0
+        - name: {{ include "cert.fullname" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 8093
           envFrom:
             - configMapRef:
-                name: cert-config
+                name: {{ include "cert.fullname" . }}-config
           env:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: cert-secrets
+                  name: {{ include "cert.fullname" . }}-secrets
                   key: DATABASE_URL
           securityContext:
             allowPrivilegeEscalation: false
@@ -57,9 +57,5 @@ spec:
             failureThreshold: 30
             periodSeconds: 2
           resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: "1"
-              memory: 512Mi
+            {{- toYaml .Values.resources | nindent 12 }}
+{{- end -}}

@@ -1,8 +1,18 @@
+enabled: true
+
+namespaceOverride: ""
+
 replicaCount: 2
+
 image:
   repository: registry.arca.local/arca-cert
   tag: "0.1.0"
-port: 8093
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
 resources:
   requests:
     cpu: 100m
@@ -10,3 +20,7 @@ resources:
   limits:
     cpu: "1"
     memory: 512Mi
+
+serviceAccount:
+  create: true
+  name: ""

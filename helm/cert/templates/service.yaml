@@ -1,15 +1,17 @@
+{{- if .Values.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: cert
-  namespace: cert
+  name: {{ include "cert.fullname" . }}
+  namespace: {{ .Values.namespaceOverride | default .Release.Namespace }}
   labels:
-    app.kubernetes.io/part-of: arca-suite
+    {{- include "cert.labels" . | nindent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   selector:
-    app.kubernetes.io/name: cert
+    {{- include "cert.selectorLabels" . | nindent 4 }}
   ports:
     - name: http
-      port: 80
+      port: {{ .Values.service.port }}
       targetPort: 8093
+{{- end -}}
