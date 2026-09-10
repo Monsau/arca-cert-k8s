@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: cert-deny-all
+  name: arca-cert-cert-deny-all
   namespace: cert
 spec:
   podSelector: {}
@@ -11,12 +11,12 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: cert-allow-ingress
+  name: arca-cert-cert-allow-ingress
   namespace: cert
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: cert
+      app.kubernetes.io/name: arca-cert-cert
   policyTypes: ["Ingress"]
   ingress:
     - from:
@@ -30,18 +30,18 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: cert-allow-egress
+  name: arca-cert-cert-allow-egress
   namespace: cert
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: cert
+      app.kubernetes.io/name: arca-cert-cert
   policyTypes: ["Egress"]
   egress:
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: platform
+              kubernetes.io/metadata.name: arca-cert-platform
       ports:
         - port: 9092
           protocol: TCP
