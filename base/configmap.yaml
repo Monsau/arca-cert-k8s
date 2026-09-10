@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cert-config
+  namespace: cert
+data:
+  ENVIRONMENT: "dev"
+  LOG_LEVEL: "INFO"
+  STORE_BACKEND: "sql"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka.platform.svc.cluster.local:9092"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.platform.svc.cluster.local:4317"

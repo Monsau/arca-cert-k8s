@@ -1,0 +1,12 @@
+replicaCount: 2
+image:
+  repository: registry.arca.local/arca-cert
+  tag: "0.1.0"
+port: 8093
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi

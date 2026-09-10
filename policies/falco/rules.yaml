@@ -1,0 +1,11 @@
+# Runtime detection rules for the cert namespace.
+- rule: cert Shell Spawned in Container
+  desc: Detect shell processes in cert pods
+  condition: spawned_process and container and k8s.ns.name=cert and proc.name in (bash, sh)
+  output: "Shell spawned in cert (user=%user.name command=%proc.cmdline)"
+  priority: WARNING
+- rule: cert Sensitive File Read
+  desc: Detect reads of sensitive files in cert pods
+  condition: open_read and container and k8s.ns.name=cert and fd.name in (/etc/shadow, /etc/sudoers)
+  output: "Sensitive file read in cert (user=%user.name file=%fd.name)"
+  priority: CRITICAL

@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cert
+  namespace: cert
+  labels:
+    app.kubernetes.io/part-of: arca-suite
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: arca-suite
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

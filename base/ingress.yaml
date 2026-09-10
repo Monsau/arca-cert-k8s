@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cert
+  namespace: cert
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.platform.svc.cluster.local/oauth2/auth"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: cert.arca.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cert
+                port:
+                  number: 80

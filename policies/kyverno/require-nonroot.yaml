@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: cert-require-nonroot
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: require-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds: ["Deployment"]
+              namespaces: ["cert"]
+      validate:
+        message: "Containers must run as non-root with a read-only root filesystem."
+        pattern:
+          spec:
+            template:
+              spec:
+                securityContext:
+                  runAsNonRoot: true
+                containers:
+                  - securityContext:
+                      allowPrivilegeEscalation: false
+                      readOnlyRootFilesystem: true

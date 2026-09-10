@@ -1,0 +1,49 @@
+# Default deny-all, then explicit allowances (zero trust).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cert-deny-all
+  namespace: cert
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cert-allow-ingress
+  namespace: cert
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cert
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              istio-injection: enabled
+      ports:
+        - port: 8093
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cert-allow-egress
+  namespace: cert
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cert
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: platform
+      ports:
+        - port: 9092
+          protocol: TCP
+        - port: 443
+          protocol: TCP
