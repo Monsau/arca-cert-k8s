@@ -6,12 +6,14 @@ metadata:
   namespace: {{ .Values.namespaceOverride | default .Release.Namespace }}
   labels:
     {{- include "cert.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
 spec:
   type: {{ .Values.service.type }}
   selector:
-    {{- include "cert.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/name: arca-cert
+    app.kubernetes.io/component: api
   ports:
     - name: http
       port: {{ .Values.service.port }}
-      targetPort: 8093
+      targetPort: http
 {{- end -}}

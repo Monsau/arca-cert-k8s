@@ -6,56 +6,43 @@ metadata:
   namespace: {{ .Values.namespaceOverride | default .Release.Namespace }}
   labels:
     {{- include "cert.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "cert.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: arca-cert
+      app.kubernetes.io/component: api
   template:
     metadata:
       labels:
-        {{- include "cert.selectorLabels" . | nindent 8 }}
+        {{- include "cert.labels" . | nindent 8 }}
+        app.kubernetes.io/component: api
     spec:
       serviceAccountName: {{ include "cert.serviceAccountName" . }}
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 10001
-        fsGroup: 10001
       containers:
-        - name: {{ include "cert.fullname" . }}
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 8093
-          envFrom:
-            - configMapRef:
-                name: {{ include "cert.fullname" . }}-config
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "cert.fullname" . }}-secrets
-                  key: DATABASE_URL
+            - { name: http, containerPort: 8080 }
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
             capabilities:
               drop: ["ALL"]
-          livenessProbe:
-            exec:
-              command: ["/app/scripts/healthcheck.sh"]
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /readyz
-              port: 8093
-            periodSeconds: 10
-          startupProbe:
-            httpGet:
-              path: /healthz
-              port: 8093
-            failureThreshold: 30
-            periodSeconds: 2
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          startupProbe:
+            httpGet: { path: /healthz, port: http }
+            failureThreshold: 12
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 15
+          readinessProbe:
+            httpGet: { path: /readyz, port: http }
+            periodSeconds: 10
 {{- end -}}
