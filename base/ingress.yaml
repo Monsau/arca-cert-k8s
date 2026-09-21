@@ -6,7 +6,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.platform.svc.cluster.local/oauth2/auth"
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - host: cert.arca.local
       http:
