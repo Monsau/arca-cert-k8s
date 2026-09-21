@@ -41,9 +41,12 @@ spec:
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
+          # The image ships neither curl nor the scripts/ directory: probe
+          # the app's own HTTP endpoint instead.
           livenessProbe:
-            exec:
-              command: ["/app/scripts/healthcheck.sh"]
+            httpGet:
+              path: /healthz
+              port: 8093
             periodSeconds: 30
           readinessProbe:
             httpGet:
