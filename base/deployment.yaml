@@ -24,7 +24,7 @@ spec:
         fsGroup: 10001
       containers:
         - name: cert
-          image: server01:5000/arca-suite/arca-cert:0.1.5
+          image: server01:5000/arca-suite/arca-cert:0.1.6
           ports:
             - containerPort: 8093
           envFrom:
